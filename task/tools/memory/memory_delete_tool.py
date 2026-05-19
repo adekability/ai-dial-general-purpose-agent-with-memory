@@ -18,23 +18,29 @@ class DeleteMemoryTool(BaseTool):
 
     @property
     def name(self) -> str:
-        # TODO: provide self-descriptive name
-        raise NotImplementedError()
+        return "delete_long_term_memory"
 
     @property
     def description(self) -> str:
-        # TODO: provide tool description that will help LLM to understand when to use this tools and cover 'tricky'
-        #  moments (not more 1024 chars)
-        raise NotImplementedError()
+        return (
+            "Permanently delete ALL long-term memories for this user. "
+            "Use only when the user explicitly asks to forget everything, clear memory, "
+            "wipe stored facts, or reset long-term memory. "
+            "This removes the data.json file from appdata and clears the in-memory cache. "
+            "Cannot be undone."
+        )
 
     @property
     def parameters(self) -> dict[str, Any]:
-        # TODO: provide tool parameters JSON Schema with empty properties
-        raise NotImplementedError()
+        return {
+            "type": "object",
+            "properties": {},
+        }
 
     async def _execute(self, tool_call_params: ToolCallParams) -> str:
-        #TODO:
-        # 1. Call `memory_store` `delete_all_memories` (we will implement logic in `memory_store` later
-        # 2. Add result to stage
-        # 3. Return result
-        raise NotImplementedError()
+        result = await self.memory_store.delete_all_memories(
+            api_key=tool_call_params.api_key,
+        )
+
+        tool_call_params.stage.append_content(f"{result}\n")
+        return result
